@@ -1,8 +1,8 @@
-torch>=2.0.0
-torchvision>=0.15.0
-diffusers>=0.25.0
-transformers>=4.35.0
-accelerate>=0.24.0
-pillow>=10.0.0
-safetensors>=0.4.0
+# Flask backend for API integration
 flask>=3.0.0
+
+# For making HTTP requests to the image generation API
+requests>=2.31.0
+
+# Optional: For image processing (resizing, saving, etc.)
+pillow>=10.0.0
