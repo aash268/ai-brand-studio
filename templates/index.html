@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Brand Studio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script defer src="{{ url_for('static', filename='script.js') }}"></script>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: white;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px 30px 20px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 42px;
+            background: linear-gradient(90deg, #8b5cf6, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            opacity: 0.7;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            padding: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            transition: 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 15px 50px rgba(139, 92, 246, 0.4);
+        }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            font-weight: 600;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 6px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.08);
+            color: white;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus, select:focus {
+            border: 1px solid #8b5cf6;
+            box-shadow: 0 0 10px rgba(139,92,246,0.5);
+        }
+
+        button {
+            margin-top: 25px;
+            padding: 14px;
+            width: 100%;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(90deg, #8b5cf6, #6366f1);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(139,92,246,0.6);
+        }
+
+        .result-box {
+            text-align: center;
+        }
+
+        #resultImage {
+            max-width: 100%;
+            border-radius: 16px;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .download-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 25px;
+            background: linear-gradient(90deg, #8b5cf6, #6366f1);
+            color: white;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .download-btn:hover {
+            box-shadow: 0 8px 20px rgba(139,92,246,0.6);
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+        select {
+    background: rgba(255,255,255,0.08);
+    color: white;
+}
+
+select option {
+    background: #1e293b;
+    color: white;
+}
+.helper-text {
+    font-size: 12px;
+    opacity: 0.6;
+    display: block;
+    margin-top: 4px;
+}
+.preview-area {
+    height: 400px;
+    border: 2px dashed rgba(255,255,255,0.2);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.preview-text {
+    font-size: 16px;
+    letter-spacing: 0.5px;
+}
+#imageContainer {
+    margin-top: 0;
+}
+    </style>
+
+</head>
+
+<body>
+
+<header>
+    <h1>AI Brand Studio</h1>
+    <p>Create Professional Logos, Posters & Banners with AI</p>
+</header>
+
+<div class="container">
+
+    <div class="card">
+
+        <label>Design Type</label>
+        <select id="designType">
+            <option value="logo">Logo</option>
+            <option value="poster">Poster</option>
+            <option value="banner">Banner</option>
+        </select>
+        <!-- LOGO FIELDS -->
+<div id="logoFields" class="dynamic-fields hidden">
+    <label>Small Slogan (Optional)</label>
+    <input type="text" id="logoSlogan" placeholder="Enter small slogan">
+</div>
+
+<!-- POSTER FIELDS -->
+<div id="posterFields" class="dynamic-fields hidden">
+    <label> Heading</label>
+    <input type="text" id="posterHeading" placeholder="Enter heading">
+
+    <label>Tagline</label>
+    <input type="text" id="posterTagline" placeholder="Enter tagline">
+</div>
+
+<!-- BANNER FIELDS -->
+<div id="bannerFields" class="dynamic-fields hidden">
+    <label>Headline</label>
+    <input type="text" id="bannerHeadline" placeholder="Enter headline">
+
+    <label>Text Content</label>
+    <input type="text" id="bannerText" placeholder="Enter banner text">
+</div>
+
+        <label>Industry</label>
+        <input type="text" id="industryInput" placeholder="Enter industry">
+        <small class="helper-text">For eg: Bakery,Clothing, Tech Startup</small>
+
+        <label>Style</label>
+        <input type="text" id="styleInput" placeholder="Minimal, Modern, Luxury">
+
+        <label>Theme</label>
+        <input type="text" id="themeInput" placeholder="Elegant, Colorful, Dark">
+
+        <button id="generateBtn">Generate Design</button>
+
+    </div>
+
+    <div class="card result-box">
+
+    <div class="preview-area">
+
+        <!-- Placeholder Text -->
+        <p id="placeholder" class="preview-text">
+            Your AI generated design will appear here:-
+        </p>
+
+        <!-- Image (hidden initially) -->
+        <img id="resultImage"
+             class="hidden"
+             src=""
+             alt="Generated Design"
+             style="max-width:100%; border-radius:16px;">
+    </div>
+
+    <!-- Download Button -->
+    <a id="downloadBtn"
+       class="download-btn"
+       style="opacity:0.5; pointer-events:none; margin-top:20px;">
+        Download Image
+    </a>
+
+</div>
+
+</body>
+</html>
