@@ -1,126 +1,112 @@
-"""
-AI Brand Studio - Flask Backend
---------------------------------
-Generates Logos, Posters, and Banners using SD-Turbo.
-AI creates layout, Python overlays correct text.
-"""
-
 from flask import Flask, render_template, request, jsonify
-from generate_image import SDTurboGenerator
+from diffusers import AutoPipelineForText2Image
+import torch
 from PIL import ImageDraw, ImageFont
-from io import BytesIO
-import base64
+import os
 
 app = Flask(__name__)
 
-print("Loading SD-Turbo model...")
-generator = SDTurboGenerator()
-print("Model ready!\n")
+# -----------------------------
+# DEVICE SETUP
+# -----------------------------
+device = "cuda" if torch.cuda.is_available() else "cpu"
+dtype = torch.float16 if device == "cuda" else torch.float32
+
+# -----------------------------
+# LOAD SD-TURBO (NO SCHEDULER EDITS)
+# -----------------------------
+pipe = AutoPipelineForText2Image.from_pretrained(
+    "stabilityai/sd-turbo",
+    torch_dtype=dtype,
+    safety_checker=None
+).to(device)
+
+pipe.set_progress_bar_config(disable=True)
+
+print(f"Model loaded successfully on {device.upper()}")
 
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+@app.route("/")
+def home():
+    return render_template("index.html")
 
 
-@app.route('/generate', methods=['POST'])
+@app.route("/generate", methods=["POST"])
 def generate():
     data = request.json
 
-    design_type = data.get("type", "logo")
-    name = data.get("name", "").strip()
-    industry = data.get("industry", "").strip()
-    style = data.get("style", "").strip()
-    theme = data.get("theme", "").strip()
+    main_text = data.get("main_text", "")
+    sub_text = data.get("sub_text", "")
+    color_style = data.get("color_style", "modern")
+    tagline = data.get("tagline", "")
 
-    if not name:
-        return jsonify({"error": True, "message": "Name is required"}), 400
+    # Simple stable prompt
+    prompt = f"{color_style} professional graphic design, clean layout, high quality"
 
-    # ---------- AI PROMPTS (NO TEXT INSIDE) ----------
-    if design_type == "logo":
-        prompt = f"""
-        Professional vector logo icon for a {industry} business,
-        {style} style, {theme} theme,
-        minimalist symbol, clean branding,
-        white background, no text, no letters
-        """
-        width, height = 512, 512
+    # 🔥 DO NOT override steps or scheduler
+    image = pipe(
+        prompt=prompt,
+        guidance_scale=0.0
+    ).images[0]
 
-    elif design_type == "poster":
-        prompt = f"""
-        Professional event poster background for {industry},
-        {style} style, {theme} theme,
-        modern layout, space for headline text,
-        high resolution
-        """
-        width, height = 512, 768
-
-    else:  # banner
-        prompt = f"""
-        Professional website banner background for {industry},
-        {style} style, {theme} theme,
-        clean layout with empty space for text,
-        modern high resolution design
-        """
-        width, height = 768, 384
+    # -----------------------------
+    # TEXT OVERLAY
+    # -----------------------------
+    draw = ImageDraw.Draw(image)
 
     try:
-        # ---------- Generate Background ----------
-        image = generator.generate(
-            prompt=prompt,
-            num_inference_steps=3,
-            width=width,
-            height=height
+        main_font = ImageFont.truetype("arial.ttf", 60)
+        sub_font = ImageFont.truetype("arial.ttf", 40)
+    except:
+        main_font = ImageFont.load_default()
+        sub_font = ImageFont.load_default()
+
+    width, height = image.size
+
+    # Center main text
+    bbox = draw.textbbox((0, 0), main_text, font=main_font)
+    text_width = bbox[2] - bbox[0]
+    x = (width - text_width) / 2
+    y = height * 0.7
+
+    draw.text(
+        (x, y),
+        main_text,
+        fill="white",
+        font=main_font,
+        stroke_width=2,
+        stroke_fill="black"
+    )
+
+    if sub_text:
+        draw.text(
+            (x, y + 70),
+            sub_text,
+            fill="white",
+            font=sub_font,
+            stroke_width=2,
+            stroke_fill="black"
         )
 
-        # ---------- Overlay Text ----------
-        draw = ImageDraw.Draw(image)
+    if tagline:
+        draw.text(
+            (x, y + 120),
+            tagline,
+            fill="white",
+            font=sub_font,
+            stroke_width=2,
+            stroke_fill="black"
+        )
 
-        try:
-            font = ImageFont.truetype("arial.ttf", int(height * 0.08))
-        except:
-            font = ImageFont.load_default()
+    # -----------------------------
+    # SAVE IMAGE
+    # -----------------------------
+    os.makedirs("static/generated", exist_ok=True)
+    file_path = "static/generated/output.png"
+    image.save(file_path)
 
-        bbox = draw.textbbox((0, 0), name, font=font)
-        text_width = bbox[2] - bbox[0]
-        text_height = bbox[3] - bbox[1]
-
-        if design_type == "logo":
-            x = (width - text_width) // 2
-            y = height - text_height - 30
-
-        elif design_type == "poster":
-            x = (width - text_width) // 2
-            y = height // 3
-
-        else:  # banner
-            x = 40
-            y = (height - text_height) // 2
-
-        draw.text((x, y), name, fill="black", font=font)
-
-        # ---------- Convert to Base64 ----------
-        buffered = BytesIO()
-        image.save(buffered, format="PNG")
-        buffered.seek(0)
-        img_str = base64.b64encode(buffered.getvalue()).decode()
-
-        return jsonify({
-            "success": True,
-            "image": f"data:image/png;base64,{img_str}"
-        })
-
-    except Exception as e:
-        return jsonify({
-            "error": True,
-            "message": str(e)
-        }), 500
+    return jsonify({"image_url": "/" + file_path})
 
 
-if __name__ == '__main__':
-    print("=" * 50)
-    print("AI BRAND STUDIO RUNNING")
-    print("http://localhost:5000")
-    print("=" * 50)
-
-    app.run(debug=True, host='0.0.0.0', port=5000)
+if __name__ == "__main__":
+    app.run(debug=True)

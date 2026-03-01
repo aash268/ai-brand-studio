@@ -50,11 +50,6 @@
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-            transition: 0.3s ease;
-        }
-
-        .card:hover {
-            box-shadow: 0 15px 50px rgba(139, 92, 246, 0.4);
         }
 
         label {
@@ -74,12 +69,16 @@
             background: rgba(255,255,255,0.08);
             color: white;
             outline: none;
-            transition: 0.3s;
         }
 
         input:focus, select:focus {
             border: 1px solid #8b5cf6;
             box-shadow: 0 0 10px rgba(139,92,246,0.5);
+        }
+
+        select option {
+            background: #1e293b;
+            color: white;
         }
 
         button {
@@ -92,7 +91,6 @@
             color: white;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.3s ease;
         }
 
         button:hover {
@@ -100,18 +98,21 @@
             box-shadow: 0 8px 20px rgba(139,92,246,0.6);
         }
 
-        .result-box {
+        .preview-area {
+            height: 400px;
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
 
         #resultImage {
             max-width: 100%;
             border-radius: 16px;
-            margin-top: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .hidden {
             display: none;
         }
 
@@ -124,11 +125,12 @@
             border-radius: 10px;
             text-decoration: none;
             font-weight: bold;
-            transition: 0.3s;
+            opacity: 0.5;
+            pointer-events: none;
         }
 
-        .download-btn:hover {
-            box-shadow: 0 8px 20px rgba(139,92,246,0.6);
+        .hidden {
+            display: none;
         }
 
         @media (max-width: 900px) {
@@ -136,42 +138,7 @@
                 grid-template-columns: 1fr;
             }
         }
-        select {
-    background: rgba(255,255,255,0.08);
-    color: white;
-}
-
-select option {
-    background: #1e293b;
-    color: white;
-}
-.helper-text {
-    font-size: 12px;
-    opacity: 0.6;
-    display: block;
-    margin-top: 4px;
-}
-.preview-area {
-    height: 400px;
-    border: 2px dashed rgba(255,255,255,0.2);
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
-
-.preview-text {
-    font-size: 16px;
-    letter-spacing: 0.5px;
-}
-#imageContainer {
-    margin-top: 0;
-}
     </style>
-
 </head>
 
 <body>
@@ -183,7 +150,11 @@ select option {
 
 <div class="container">
 
+    <!-- LEFT SIDE FORM -->
     <div class="card">
+
+        <label>Brand Name</label>
+        <input type="text" id="nameInput" placeholder="Enter brand name">
 
         <label>Design Type</label>
         <select id="designType">
@@ -191,33 +162,9 @@ select option {
             <option value="poster">Poster</option>
             <option value="banner">Banner</option>
         </select>
-        <!-- LOGO FIELDS -->
-<div id="logoFields" class="dynamic-fields hidden">
-    <label>Small Slogan (Optional)</label>
-    <input type="text" id="logoSlogan" placeholder="Enter small slogan">
-</div>
-
-<!-- POSTER FIELDS -->
-<div id="posterFields" class="dynamic-fields hidden">
-    <label> Heading</label>
-    <input type="text" id="posterHeading" placeholder="Enter heading">
-
-    <label>Tagline</label>
-    <input type="text" id="posterTagline" placeholder="Enter tagline">
-</div>
-
-<!-- BANNER FIELDS -->
-<div id="bannerFields" class="dynamic-fields hidden">
-    <label>Headline</label>
-    <input type="text" id="bannerHeadline" placeholder="Enter headline">
-
-    <label>Text Content</label>
-    <input type="text" id="bannerText" placeholder="Enter banner text">
-</div>
 
         <label>Industry</label>
         <input type="text" id="industryInput" placeholder="Enter industry">
-        <small class="helper-text">For eg: Bakery,Clothing, Tech Startup</small>
 
         <label>Style</label>
         <input type="text" id="styleInput" placeholder="Minimal, Modern, Luxury">
@@ -225,33 +172,47 @@ select option {
         <label>Theme</label>
         <input type="text" id="themeInput" placeholder="Elegant, Colorful, Dark">
 
+        <!-- LOGO FIELDS -->
+        <div id="logoFields">
+            <label>Logo Slogan (Optional)</label>
+            <input type="text" id="logoSlogan" placeholder="Enter slogan">
+        </div>
+
+        <!-- POSTER FIELDS -->
+        <div id="posterFields" class="hidden">
+            <label>Poster Heading *</label>
+            <input type="text" id="posterHeading" placeholder="Main heading">
+
+            <label>Poster Tagline</label>
+            <input type="text" id="posterTagline" placeholder="Optional tagline">
+        </div>
+
+        <!-- BANNER FIELDS -->
+        <div id="bannerFields" class="hidden">
+            <label>Banner Headline *</label>
+            <input type="text" id="bannerHeadline" placeholder="Main headline">
+
+            <label>Banner Text</label>
+            <input type="text" id="bannerText" placeholder="Optional text">
+        </div>
+
         <button id="generateBtn">Generate Design</button>
 
     </div>
 
-    <div class="card result-box">
+    <!-- RIGHT SIDE PREVIEW -->
+    <div class="card">
 
-    <div class="preview-area">
+        <div class="preview-area">
+            <p id="placeholder">
+                Your AI generated design will appear here
+            </p>
+            <img id="resultImage" src="">
+        </div>
+        <a id="downloadBtn" class="download-btn" download="design.png">
+        </a>
 
-        <!-- Placeholder Text -->
-        <p id="placeholder" class="preview-text">
-            Your AI generated design will appear here:-
-        </p>
-
-        <!-- Image (hidden initially) -->
-        <img id="resultImage"
-             class="hidden"
-             src=""
-             alt="Generated Design"
-             style="max-width:100%; border-radius:16px;">
     </div>
-
-    <!-- Download Button -->
-    <a id="downloadBtn"
-       class="download-btn"
-       style="opacity:0.5; pointer-events:none; margin-top:20px;">
-        Download Image
-    </a>
 
 </div>
 

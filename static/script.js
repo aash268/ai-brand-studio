@@ -1,108 +1,77 @@
-document.addEventListener("DOMContentLoaded", () => {
-
-    const typeSelect = document.getElementById("designType");
-    const industryInput = document.getElementById("industryInput");
-    const styleInput = document.getElementById("styleInput");
-    const themeInput = document.getElementById("themeInput");
+document.addEventListener("DOMContentLoaded", function () {
 
     const generateBtn = document.getElementById("generateBtn");
     const resultImage = document.getElementById("resultImage");
     const placeholder = document.getElementById("placeholder");
     const downloadBtn = document.getElementById("downloadBtn");
-    // Dynamic Fields
-const logoFields = document.getElementById("logoFields");
-const posterFields = document.getElementById("posterFields");
-const bannerFields = document.getElementById("bannerFields");
 
-function hideAllFields() {
-    logoFields.classList.add("hidden");
-    posterFields.classList.add("hidden");
-    bannerFields.classList.add("hidden");
-}
+    const designType = document.getElementById("designType");
 
-typeSelect.addEventListener("change", function () {
-    hideAllFields();
+    const logoFields = document.getElementById("logoFields");
+    const posterFields = document.getElementById("posterFields");
+    const bannerFields = document.getElementById("bannerFields");
 
-    if (this.value === "logo") {
-        logoFields.classList.remove("hidden");
-    }
+    // Show / Hide dynamic fields
+    designType.addEventListener("change", function () {
+        logoFields.classList.add("hidden");
+        posterFields.classList.add("hidden");
+        bannerFields.classList.add("hidden");
 
-    if (this.value === "poster") {
-        posterFields.classList.remove("hidden");
-    }
+        if (designType.value === "logo") {
+            logoFields.classList.remove("hidden");
+        } else if (designType.value === "poster") {
+            posterFields.classList.remove("hidden");
+        } else if (designType.value === "banner") {
+            bannerFields.classList.remove("hidden");
+        }
+    });
 
-    if (this.value === "banner") {
-        bannerFields.classList.remove("hidden");
-    }
-});
+    generateBtn.addEventListener("click", async function () {
 
-// Show correct fields on page load
-typeSelect.dispatchEvent(new Event("change"));
+        const type = designType.value;
+        const brandName = document.getElementById("nameInput").value;
+        const industry = document.getElementById("industryInput").value;
+        const style = document.getElementById("styleInput").value;
+        const theme = document.getElementById("themeInput").value;
 
-    generateBtn.addEventListener("click", generateDesign);
+        let main_text = "";
+        let sub_text = "";
 
-    async function generateDesign() {
-
-        const type = typeSelect.value;
-        let name = "";
-
-if (type === "logo") {
-    name = document.getElementById("logoSlogan").value.trim();
-}
-
-if (type === "poster") {
-    name = document.getElementById("posterHeading").value.trim();
-}
-
-if (type === "banner") {
-    name = document.getElementById("bannerHeadline").value.trim();
-}
-        const industry = industryInput.value.trim();
-        const style = styleInput.value.trim();
-        const theme = themeInput.value.trim();
-
-        if (!name) {
-            alert("Please enter name!");
-            return;
+        if (type === "logo") {
+            main_text = brandName;
+            sub_text = document.getElementById("logoSlogan").value;
+        } else if (type === "poster") {
+            main_text = document.getElementById("posterHeading").value;
+            sub_text = document.getElementById("posterTagline").value;
+        } else if (type === "banner") {
+            main_text = document.getElementById("bannerHeadline").value;
+            sub_text = document.getElementById("bannerText").value;
         }
 
-        generateBtn.disabled = true;
-        generateBtn.innerText = "Generating...";
+        const response = await fetch("/generate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                type: type,
+                main_text: main_text,
+                sub_text: sub_text,
+                color_style: style,
+                tagline: theme
+            })
+        });
 
-        try {
-            const response = await fetch("/generate", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    type: type,
-                    name: name,
-                    industry: industry,
-                    style: style,
-                    theme: theme
-                })
-            });
+        const data = await response.json();
 
-            const data = await response.json();
+        resultImage.src = data.image_url + "?t=" + new Date().getTime();
+        resultImage.style.display = "block";
+        placeholder.style.display = "none";
 
-            if (data.error) {
-                alert(data.message);
-                return;
-            }
-
-            resultImage.src = data.image;
-            placeholder.classList.add("hidden");
-            resultImage.classList.remove("hidden");
-downloadBtn.href = data.image;
-downloadBtn.download = "design.png";
-downloadBtn.style.opacity = "1";
-downloadBtn.style.pointerEvents = "auto";
-
-        } catch (error) {
-            alert("Server error. Check backend.");
-        }
-
-        generateBtn.disabled = false;
-        generateBtn.innerText = "Generate Design";
-    }
+        downloadBtn.href = data.image_url;
+        downloadBtn.style.opacity = "1";
+        downloadBtn.style.pointerEvents = "auto";
+        downloadBtn.textContent = "Download Design";
+    });
 
 });

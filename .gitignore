@@ -1,3 +1,32 @@
+# Virtual Environment
 venv/
+env/
+
+# Python cache
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+
+# Environment variables
+.env
+
+# Model weights
+*.pt
+*.pth
+*.safetensors
+
+# HuggingFace cache (important)
+.cache/
+
+# Generated images
+static/generated/
+outputs/
+web_outputs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/   
