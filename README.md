@@ -1,45 +1,59 @@
-# 🚀 AI Brand Studio
+# 🚀 AI Brand Studio – Generative Poster & Logo Creator
 
-AI Brand Studio is a lightweight web application that generates brand-style images using AI-powered image generation APIs.
+AI Brand Studio is a Flask-based web application that generates AI-powered brand-style visuals using Stable Diffusion (SD-Turbo) for real-time image synthesis.
 
-It provides a simple interface for users to enter prompts and instantly receive AI-generated visuals. This project demonstrates API integration, backend handling, frontend interaction, and clean deployment-ready architecture.
+The application allows users to enter prompts and dynamically generates AI-designed backgrounds with structured text overlay rendering.
+
+This project demonstrates end-to-end AI model integration within a web application architecture.
 
 ---
 
 ## ✨ Features
 
-- 🧠 AI-powered image generation  
-- 🌐 Clean web interface  
-- ⚡ Fast API-based processing  
-- 🛠 Flask backend integration  
-- 📦 Lightweight & deployment-ready structure  
-- 🔐 Secure API key handling via environment variables  
+- 🧠 Real-time AI image generation using Stable Diffusion (SD-Turbo)
+- 🎨 Dynamic prompt-based visual creation
+- 📝 Text overlay rendering using PIL (Pillow)
+- 🌐 Interactive web interface
+- ⚡ Fast local inference pipeline
+- 🛠 Modular Flask backend structure
+- 📦 Clean, Git-ready project setup
 
 ---
 
 ## 🛠 Tech Stack
 
-- **Backend:** Flask  
-- **Frontend:** HTML, CSS, JavaScript  
-- **AI Integration:** Image Generation API  
-- **Version Control:** Git & GitHub  
-- **Deployment:** Ready  
+### Backend
+- Python
+- Flask
+- PyTorch
+- HuggingFace Diffusers
+
+### Frontend
+- HTML
+- CSS
+- JavaScript
+
+### Image Processing
+- PIL (Pillow)
+
+### Version Control
+- Git & GitHub
 
 ---
 
 ## 📂 Project Structure
 
 ```
-sd-turbo-project/
+ai-brand-studio/
 │
 ├── app.py
-├── generate_image.py
 ├── requirements.txt
 ├── .gitignore
 │
 ├── static/
 │   ├── style.css
-│   └── script.js
+│   ├── script.js
+│   └── generated/
 │
 └── templates/
     └── index.html
@@ -51,52 +65,53 @@ sd-turbo-project/
 
 ### 1️⃣ Clone the repository
 
-```
-git clone https://github.com/YOUR_USERNAME/sd-turbo-project.git
-cd sd-turbo-project
+```bash
+git clone https://github.com/YOUR_USERNAME/ai-brand-studio.git
+cd ai-brand-studio
 ```
 
 ### 2️⃣ Create virtual environment
 
-```
+```bash
 python -m venv venv
 venv\Scripts\activate
 ```
 
 ### 3️⃣ Install dependencies
 
-```
+```bash
 pip install -r requirements.txt
 ```
 
-### 4️⃣ Set your API key (Windows PowerShell)
+### 4️⃣ Run the application
 
-```
-setx API_KEY "your_api_key_here"
-```
-
-### 5️⃣ Run the application
-
-```
+```bash
 python app.py
 ```
 
+Then open:
+
+http://127.0.0.1:5000
+
 ---
 
-## 🔐 Environment Variables
+## 🧠 How It Works
 
-This project uses environment variables to securely store API keys.  
-Never commit API keys directly into the repository.
+1. User enters a design prompt
+2. Backend sends prompt to Stable Diffusion (SD-Turbo) pipeline
+3. Model generates background image
+4. PIL overlays custom brand text
+5. Generated image is served dynamically to frontend
 
 ---
 
 ## 🚀 Future Improvements
 
-- User authentication system  
-- Image history storage  
-- Download functionality  
-- Cloud deployment (Render / Railway / AWS)  
-- Advanced prompt customization  
+- Higher-quality diffusion models
+- Cloud deployment (Render / Railway / HuggingFace Spaces)
+- User authentication
+- Image history storage
+- Downloadable high-resolution images
 
 ---
 
@@ -104,12 +119,11 @@ Never commit API keys directly into the repository.
 
 This project showcases:
 
-- Backend API integration  
-- Clean project architecture  
-- Environment variable security practices  
-- Deployment-ready application design  
-
-It demonstrates practical AI integration in a real-world web application.
+- AI model integration inside a web application
+- Backend–frontend communication
+- Real-time generative inference
+- Clean software project structure
+- Practical deployment preparation
 
 ---
 
